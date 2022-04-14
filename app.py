@@ -1,15 +1,13 @@
-import streamlit as st
 from sqlalchemy.engine import create_engine, Engine
 from dotenv import load_dotenv
-from queries import *
-import os
-import numpy as np
-import pandas as pd
 from loaders import *
 from filters import *
 from plotting import *
+import plotly.express as px
+
 
 load_dotenv()
+px.set_mapbox_access_token(os.getenv("MAPBOX_API_KEY"))
 
 engine = create_engine(os.getenv("POSTGRES_CONNECTION_STRING"))
 
@@ -124,6 +122,8 @@ if submit:
                 color_key = "name_maker"
                 st.plotly_chart(plot_manufacturer_breakdown(filtered_df))
 
+
+            st.plotly_chart(plot_hotspot_locations(filtered_df, color_key))
             st.plotly_chart(plot_witness_counts(filtered_df, baseline_df))
             st.plotly_chart(plot_witness_distances(filtered_df, baseline_df))
             st.plotly_chart(plot_avg_tx_reward_scales(filtered_df, baseline_df))

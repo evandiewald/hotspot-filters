@@ -1,6 +1,7 @@
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import h3
 
 
 def plot_witness_counts(filtered_df: pd.DataFrame, baseline_df: pd.DataFrame, color_key: str = "source"):
@@ -200,4 +201,24 @@ def plot_denylist_breakdown(filtered_df: pd.DataFrame):
     fig.update_layout(
         title_text="Any-time Denied Hotspots in Subset"
     )
+    return fig
+
+
+def plot_hotspot_locations(filtered_df: pd.DataFrame, color_key: str = "rx_on_denylist"):
+    # not sure why result_type = "expand" isn't doing this in one step
+
+    filtered_df["coords"] = filtered_df["location"].apply(h3.h3_to_geo)
+    filtered_df["lat"] = filtered_df["coords"].apply(lambda x: x[0])
+    filtered_df["lon"] = filtered_df["coords"].apply(lambda x: x[1])
+
+    fig = px.scatter_mapbox(filtered_df, lat="lat", lon="lon", hover_name="address_gateway", color=color_key)
+    fig.update_layout(mapbox_style="dark",
+                      # mapbox_accesstoken=os.getenv("MAPBOX_API_KEY"),
+                      showlegend=False,
+                      mapbox_zoom=3,
+                      mapbox_center=dict(
+                          lat=filtered_df["lat"].iloc[0],
+                          lon=filtered_df["lon"].iloc[0]
+                      ),
+                      margin={'l':0, 'r':0, 'b':0, 't':0})
     return fig
