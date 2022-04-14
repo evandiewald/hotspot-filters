@@ -64,9 +64,9 @@ with st.expander("Antenna Gain / Elevation"):
 # average / std age of transmitters
 with st.expander("Age and Variability of Witnessed Hotspots"):
     avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e5), value=(0, int(5e6)), step=1000)
+                                  min_value=0, max_value=int(5e5), value=(0, int(5e5)), step=1000)
     std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e5), value=(0, int(5e6)), step=1000)
+                                  min_value=0, max_value=int(5e5), value=(0, int(1e5)), step=1000)
 
 # hotspot has been moved
 with st.expander("Re-asserted Hotspots"):
@@ -126,6 +126,7 @@ if submit:
             st.plotly_chart(plot_hotspot_locations(filtered_df, color_key))
             st.plotly_chart(plot_witness_counts(filtered_df, baseline_df))
             st.plotly_chart(plot_witness_distances(filtered_df, baseline_df))
+            st.plotly_chart(plot_data_credits(filtered_df, baseline_df))
             st.plotly_chart(plot_avg_tx_reward_scales(filtered_df, baseline_df))
             st.plotly_chart(plot_same_maker_ratio(filtered_df, baseline_df))
             st.plotly_chart(plot_avg_tx_age_blocks(filtered_df, baseline_df))

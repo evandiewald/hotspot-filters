@@ -126,6 +126,37 @@ def plot_same_maker_ratio(filtered_df: pd.DataFrame, baseline_df: pd.DataFrame, 
     return fig
 
 
+def plot_data_credits(filtered_df: pd.DataFrame, baseline_df: pd.DataFrame, color_key: str = "source"):
+    fig = go.Figure()
+    fig.add_trace(go.Histogram(x=filtered_df["packets_transferred"],
+                               name="Filtered",
+                               histnorm="probability density",
+                               xbins=dict(
+                                   start=0,
+                                   end=1000,
+                                   size=10
+                               )))
+    fig.add_trace(go.Histogram(x=baseline_df["packets_transferred"],
+                               name="Baseline",
+                               histnorm="probability density",
+                               xbins=dict(
+                                   start=0,
+                                   end=1000,
+                                   size=10
+                               )))
+
+    # Overlay both histograms
+    fig.update_layout(barmode="overlay")
+    # Reduce opacity to see both histograms
+    fig.update_traces(opacity=0.3)
+    fig.update_layout(
+        title_text="Data Transfer",  # title of plot
+        xaxis_title_text="Packets Transferred",  # xaxis label
+        yaxis_title_text="P(x)"  # yaxis label
+    )
+    return fig
+
+
 def plot_avg_tx_age_blocks(filtered_df: pd.DataFrame, baseline_df: pd.DataFrame, color_key: str = "source"):
     fig = go.Figure()
     fig.add_trace(go.Histogram(x=filtered_df["avg_tx_age_blocks"],
