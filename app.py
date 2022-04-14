@@ -64,9 +64,9 @@ with st.expander("Antenna Gain / Elevation"):
 # average / std age of transmitters
 with st.expander("Age and Variability of Witnessed Hotspots"):
     avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e6), value=(0, int(5e6)), step=1000)
+                                  min_value=0, max_value=int(5e5), value=(0, int(5e6)), step=1000)
     std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e6), value=(0, int(5e6)), step=1000)
+                                  min_value=0, max_value=int(5e5), value=(0, int(5e6)), step=1000)
 
 # hotspot has been moved
 with st.expander("Re-asserted Hotspots"):
