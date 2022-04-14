@@ -7,7 +7,7 @@ import plotly.express as px
 
 
 load_dotenv()
-px.set_mapbox_access_token(os.getenv("MAPBOX_API_KEY"))
+px.set_mapbox_access_token(open(".mapbox_token").read())
 
 engine = create_engine(os.getenv("POSTGRES_CONNECTION_STRING"))
 
