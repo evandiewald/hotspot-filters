@@ -108,25 +108,26 @@ if submit:
     )
     filtered_df = filter_dataset(dataset, filters)
 
-
     n_results = len(filtered_df)
     st.metric("Number of Hotspots in Subset", value=n_results)
-    if n_results > 100e3:
-        st.warning("Result set is too large to display dataframe.")
-    else:
-        st.dataframe(filtered_df)
 
-        if categorize_by == "Denylist Status":
-            color_key = "rx_on_denylist"
-            st.plotly_chart(plot_denylist_breakdown(filtered_df))
+    with st.spinner("Generating Plots..."):
+        if n_results > 100e3:
+            st.warning("Result set is too large to display dataframe.")
         else:
-            color_key = "name_maker"
-            st.plotly_chart(plot_manufacturer_breakdown(filtered_df))
+            st.dataframe(filtered_df)
 
-        st.plotly_chart(plot_witness_counts(filtered_df, baseline_df))
-        st.plotly_chart(plot_witness_distances(filtered_df, baseline_df))
-        st.plotly_chart(plot_avg_tx_reward_scales(filtered_df, baseline_df))
-        st.plotly_chart(plot_same_maker_ratio(filtered_df, baseline_df))
-        st.plotly_chart(plot_avg_tx_age_blocks(filtered_df, baseline_df))
-        st.plotly_chart(plot_std_tx_first_block(filtered_df, baseline_df))
+            if categorize_by == "Denylist Status":
+                color_key = "rx_on_denylist"
+                st.plotly_chart(plot_denylist_breakdown(filtered_df))
+            else:
+                color_key = "name_maker"
+                st.plotly_chart(plot_manufacturer_breakdown(filtered_df))
+
+            st.plotly_chart(plot_witness_counts(filtered_df, baseline_df))
+            st.plotly_chart(plot_witness_distances(filtered_df, baseline_df))
+            st.plotly_chart(plot_avg_tx_reward_scales(filtered_df, baseline_df))
+            st.plotly_chart(plot_same_maker_ratio(filtered_df, baseline_df))
+            st.plotly_chart(plot_avg_tx_age_blocks(filtered_df, baseline_df))
+            st.plotly_chart(plot_std_tx_first_block(filtered_df, baseline_df))
 
