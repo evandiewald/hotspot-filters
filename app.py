@@ -1,3 +1,5 @@
+import plistlib
+
 from sqlalchemy.engine import create_engine, Engine
 from dotenv import load_dotenv
 from loaders import *
@@ -13,10 +15,13 @@ engine = create_engine(os.getenv("POSTGRES_CONNECTION_STRING"))
 
 dataset = load_dataset(engine)
 baseline_df = dataset.sample(10000) # cache a baseline for comparison
+hotspots_per_account = pd.DataFrame(dataset.groupby("owner").size())
 options = get_form_config(dataset)
 
 st.title("Hotspot POC Filtering")
-st.markdown("This tool is for combing through the entire hotspot population based on common metrics related to POC.")
+st.markdown("""This tool is useful for combing through the entire hotspot population based on common metrics related to POC.
+Results, which are refreshed daily, are based on challenge receipts and data transfer metrics for the last `15,000` blocks.
+See [`helium-transaction-etl`](https://github.com/evandiewald/helium-transaction-etl).""")
 
 # makers
 with st.expander("Makers"):
@@ -41,10 +46,10 @@ with st.expander("Witness Counts"):
 
 # distances
 with st.expander("Witness Distances"):
-    med_distance_range = st.slider("Select percentile range of median witness distances (km).",
+    med_distance_range = st.slider("Select percentile range of median witness distances.",
                                   min_value=0, max_value=100, value=(0, 100), step=1)
-    max_distance_range = st.slider("Select percentile range of max witness distances (km).",
-                                  min_value=0, max_value=100, value=(0, 100), step=5)
+    max_distance_range = st.slider("Select percentile range of max witness distances.",
+                                  min_value=0, max_value=100, value=(0, 100), step=1)
 
 # transmit scale
 with st.expander("Reward Scales"):
@@ -76,6 +81,8 @@ with st.expander("Re-asserted Hotspots"):
 with st.expander("Denylist"):
     on_current_denylist = st.checkbox("Only include hotspots on the CURRENT denylist.")
     on_any_denylist = st.checkbox("Only include hotspots on ANY iteration of the denylist.", disabled=on_current_denylist)
+    previously_denied = st.checkbox("Only include hotspots that were denied in a previous iteration of the denylist, but not the current version", disabled=on_current_denylist)
+    never_denied = st.checkbox("Only include hotspots that have never been denied.", disabled=on_current_denylist)
     # witnesses a denylisted transmitter
     witnesses_denylisted_tx = st.checkbox("Only include hotspots that have witnessed a denylisted hotspot.")
 
@@ -102,9 +109,15 @@ if submit:
         gain_range=gain_range,
         elevation_range=elevation_range,
         on_current_denylist=on_current_denylist,
-        on_any_denylist=on_any_denylist
+        on_any_denylist=on_any_denylist,
+        previously_denied=previously_denied,
+        never_denied=never_denied
     )
     filtered_df = filter_dataset(dataset, filters)
+
+    filtered_df["source"] = "filtered"
+    baseline_df["source"] = "baseline"
+    plot_df = pd.concat([filtered_df, baseline_df])
 
     n_results = len(filtered_df)
     st.metric("Number of Hotspots in Subset", value=n_results)
@@ -117,18 +130,37 @@ if submit:
 
             if categorize_by == "Denylist Status":
                 color_key = "rx_on_denylist"
-                st.plotly_chart(plot_denylist_breakdown(filtered_df))
             else:
                 color_key = "name_maker"
-                st.plotly_chart(plot_manufacturer_breakdown(filtered_df))
 
+            st.subheader("Denylist Breakdown")
+            st.plotly_chart(plot_denylist_breakdown(filtered_df, baseline_df))
 
+            st.subheader("Hotspot Locations")
             st.plotly_chart(plot_hotspot_locations(filtered_df, color_key))
-            st.plotly_chart(plot_witness_counts(filtered_df, baseline_df))
-            st.plotly_chart(plot_witness_distances(filtered_df, baseline_df))
-            st.plotly_chart(plot_data_credits(filtered_df, baseline_df))
-            st.plotly_chart(plot_avg_tx_reward_scales(filtered_df, baseline_df))
-            st.plotly_chart(plot_same_maker_ratio(filtered_df, baseline_df))
-            st.plotly_chart(plot_avg_tx_age_blocks(filtered_df, baseline_df))
-            st.plotly_chart(plot_std_tx_first_block(filtered_df, baseline_df))
+
+            st.subheader("Ownership Patterns")
+            st.plotly_chart(plot_ownership_breakdown(filtered_df, hotspots_per_account))
+
+            st.subheader("Witness Counts")
+            st.plotly_chart(plot_histogram(plot_df, "n_witnessed"))
+
+            st.subheader("Witness Distances")
+            st.plotly_chart(plot_histogram(plot_df, "med_distance"))
+
+            st.subheader("Data Transfer")
+            st.plotly_chart(plot_data_transfer(filtered_df, baseline_df))
+
+            st.subheader("Reward Scales of Witnessed")
+            st.plotly_chart(plot_histogram(plot_df, "avg_tx_reward_scale"))
+
+            st.subheader("Same-Maker Witnessing")
+            st.plotly_chart(plot_histogram(plot_df, "same_maker_ratio"))
+
+            st.subheader("Age of Witnessed Hotspots")
+            st.plotly_chart(plot_histogram(plot_df, "avg_tx_age_blocks"))
+
+            st.subheader("Variability in Age of Witnessed Hotspots")
+            st.plotly_chart(plot_histogram(plot_df, "std_tx_first_block"))
+
 

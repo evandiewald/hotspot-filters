@@ -34,6 +34,8 @@ class Filters(BaseModel):
 
     on_current_denylist: bool = False
     on_any_denylist: bool = False
+    previously_denied: bool = False
+    never_denied: bool = False
 
 
 def filter_dataset(dataset: pd.DataFrame, filters: Filters) -> pd.DataFrame:
@@ -66,6 +68,7 @@ def filter_dataset(dataset: pd.DataFrame, filters: Filters) -> pd.DataFrame:
         (dataset["elevation"].between(np.percentile(dataset["elevation"], filters.elevation_range[0]),
                                       np.percentile(dataset["elevation"], filters.elevation_range[1]))) &
         (dataset["rx_on_denylist"] == 1 if filters.on_current_denylist else True) &
-        (dataset["denied_at_some_point"] if filters.on_any_denylist else True)
+        (dataset["rx_on_denylist"] == 0 if filters.previously_denied or filters.never_denied else True) &
+        (dataset["denied_at_some_point"] if filters.on_any_denylist or filters.previously_denied else True)
         ]
     return filtered

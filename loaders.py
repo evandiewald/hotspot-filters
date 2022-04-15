@@ -25,7 +25,7 @@ def load_unique_denied_hotspots():
     return set(denylist["address"])
 
 
-@st.experimental_memo
+@st.experimental_memo(ttl=86400) # refresh daily
 def load_dataset(_engine: Engine) -> pd.DataFrame:
     today_str = datetime.today().strftime("%Y-%m-%d")
     result_path = f"static/cache_{today_str}.csv.gz"
