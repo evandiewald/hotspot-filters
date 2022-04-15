@@ -23,71 +23,75 @@ st.markdown("""This tool is useful for combing through the entire hotspot popula
 Results, which are refreshed daily, are based on challenge receipts and data transfer metrics for the last `15,000` blocks.
 See [`helium-transaction-etl`](https://github.com/evandiewald/helium-transaction-etl).""")
 
-# makers
-with st.expander("Makers"):
-    makers = st.multiselect("Manufacturer(s)", options=options.makers, default=options.makers)
-    # only witnesses same maker
-    same_maker_only = st.checkbox("Only include hotspots that exclusively witness others of the same manufacturer.")
+with st.form("filters_form") as form:
+    # makers
+    with st.expander("Makers"):
+        makers = st.multiselect("Manufacturer(s)", options=options.makers, default=options.makers)
+        # only witnesses same maker
+        same_maker_only = st.checkbox("Only include hotspots that exclusively witness others of the same manufacturer.")
 
-# data transfer
-with st.expander("Data Transfer"):
-    data_transfer_opts = st.radio("Data Transfer", ["Data Transferring Hotspots ONLY", "NO Data Transferring Hotspots ONLY", "Custom Range"],
-                                  index=2)
-    data_transfer_slider_disabled: bool = False if data_transfer_opts == "Custom Range" else True
-    data_transfer_range = st.slider("Select percentile range of data transferring hotspots",
-                                    min_value=0, max_value=100, value=(0, 100), step=1, disabled=data_transfer_slider_disabled)
+    # data transfer
+    with st.expander("Data Transfer"):
+        data_transfer_opts = st.radio("Data Transfer", ["Data Transferring Hotspots ONLY", "NO Data Transferring Hotspots ONLY", "Custom Range"],
+                                      index=2)
+        data_transfer_slider_disabled: bool = False if data_transfer_opts == "Custom Range" else True
+        data_transfer_range = st.slider("Select percentile range of data transferring hotspots",
+                                        min_value=0, max_value=100, value=(0, 100), step=1, disabled=data_transfer_slider_disabled)
 
-# witnessing numbers
-with st.expander("Witness Counts"):
-    n_witnessed_range = st.slider("Select percentile range of number of unique witnesses.",
-                                  min_value=0, max_value=100, value=(0, 100), step=1)
-    total_witnessed_range = st.slider("Select percentile range for total number of witness events.",
-                                  min_value=0, max_value=100, value=(0, 100), step=1)
+    # witnessing numbers
+    with st.expander("Witness Counts"):
+        n_witnessed_range = st.slider("Select percentile range of number of unique witnesses.",
+                                      min_value=0, max_value=100, value=(0, 100), step=1)
+        total_witnessed_range = st.slider("Select percentile range for total number of witness events.",
+                                      min_value=0, max_value=100, value=(0, 100), step=1)
 
-# distances
-with st.expander("Witness Distances"):
-    med_distance_range = st.slider("Select percentile range of median witness distances.",
-                                  min_value=0, max_value=100, value=(0, 100), step=1)
-    max_distance_range = st.slider("Select percentile range of max witness distances.",
-                                  min_value=0, max_value=100, value=(0, 100), step=1)
+    # distances
+    with st.expander("Witness Distances"):
+        med_distance_range = st.slider("Select percentile range of median witness distances.",
+                                      min_value=0, max_value=100, value=(0, 100), step=1)
+        max_distance_range = st.slider("Select percentile range of max witness distances.",
+                                      min_value=0, max_value=100, value=(0, 100), step=1)
 
-# transmit scale
-with st.expander("Reward Scales"):
-    perfect_reward_scale_only = st.checkbox("Only include hotspots who only witness beaconers with an optimal reward scale.")
-    avg_tx_reward_scale_range = st.slider("Select range of average reward scales.",
-                                  min_value=0.0, max_value=1.0, value=(0., 1.), step=0.05, disabled=perfect_reward_scale_only)
-    std_tx_reward_scale_range = st.slider("Select range of standard deviations in reward scales.",
-                                  min_value=0.0, max_value=1.0, value=(0., 1.), step=0.05, disabled=perfect_reward_scale_only)
+    # transmit scale
+    with st.expander("Reward Scales"):
+        perfect_reward_scale_only = st.checkbox("Only include hotspots who only witness beaconers with an optimal reward scale.")
+        avg_tx_reward_scale_range = st.slider("Select range of average reward scales.",
+                                      min_value=0.0, max_value=1.0, value=(0., 1.), step=0.05, disabled=perfect_reward_scale_only)
+        std_tx_reward_scale_range = st.slider("Select range of standard deviations in reward scales.",
+                                      min_value=0.0, max_value=1.0, value=(0., 1.), step=0.05, disabled=perfect_reward_scale_only)
 
-# antenna gain / elevation
-with st.expander("Antenna Gain / Elevation"):
-    gain_range = st.slider("Select range of antenna gains (dB).",
-                           min_value=10, max_value=150, value=(10, 150), step=10)
-    elevation_range = st.slider("Select percentile range of elevations.",
-                           min_value=0, max_value=100, value=(0, 100), step=1)
+    # antenna gain / elevation
+    with st.expander("Antenna Gain / Elevation"):
+        gain_range = st.slider("Select range of antenna gains (dB).",
+                               min_value=10, max_value=150, value=(10, 150), step=10)
+        elevation_range = st.slider("Select percentile range of elevations.",
+                               min_value=0, max_value=100, value=(0, 100), step=1)
 
-# average / std age of transmitters
-with st.expander("Age and Variability of Witnessed Hotspots"):
-    avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e5), value=(0, int(5e5)), step=1000)
-    std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
-                                  min_value=0, max_value=int(5e5), value=(0, int(1e5)), step=1000)
+    # average / std age of transmitters
+    with st.expander("Age and Variability of Witnessed Hotspots"):
+        avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
+                                      min_value=0, max_value=int(5e5), value=(0, int(5e5)), step=1000)
+        std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
+                                      min_value=0, max_value=int(5e5), value=(0, int(1e5)), step=1000)
 
-# hotspot has been moved
-with st.expander("Re-asserted Hotspots"):
-    reasserted_hotspots_only = st.checkbox("Only include hotspots that have been reasserted.")
+    # hotspot has been moved
+    with st.expander("Re-asserted Hotspots"):
+        reasserted_hotspots_only = st.checkbox("Only include hotspots that have been reasserted.")
 
-# denylist
-with st.expander("Denylist"):
-    on_current_denylist = st.checkbox("Only include hotspots on the CURRENT denylist.")
-    on_any_denylist = st.checkbox("Only include hotspots on ANY iteration of the denylist.", disabled=on_current_denylist)
-    previously_denied = st.checkbox("Only include hotspots that were denied in a previous iteration of the denylist, but not the current version", disabled=on_current_denylist)
-    never_denied = st.checkbox("Only include hotspots that have never been denied.", disabled=on_current_denylist)
-    # witnesses a denylisted transmitter
-    witnesses_denylisted_tx = st.checkbox("Only include hotspots that have witnessed a denylisted hotspot.")
+    # denylist
+    with st.expander("Denylist"):
+        on_current_denylist = st.checkbox("Only include hotspots on the CURRENT denylist.")
+        on_any_denylist = st.checkbox("Only include hotspots on ANY iteration of the denylist.", disabled=on_current_denylist)
+        previously_denied = st.checkbox("Only include hotspots that were denied in a previous iteration of the denylist, but not the current version", disabled=on_current_denylist)
+        never_denied = st.checkbox("Only include hotspots that have never been denied.", disabled=on_current_denylist)
+        # witnesses a denylisted transmitter
+        witnesses_denylisted_tx = st.checkbox("Only include hotspots that have witnessed a denylisted hotspot.")
 
-categorize_by = st.radio("Categorize Plots by", ["Denylist Status", "Manufacturer"])
-submit = st.button("Submit")
+    categorize_by = st.radio("Categorize Plots by", ["Denylist Status", "Manufacturer"])
+    display_df = st.checkbox("Show Result Set Dataframe")
+    display_plots = st.checkbox("Show plots")
+    submit = st.form_submit_button("Submit")
+
 
 if submit:
     filters = Filters(
@@ -126,41 +130,43 @@ if submit:
         if n_results > 100e3:
             st.warning("Result set is too large to display dataframe.")
         else:
-            st.dataframe(filtered_df)
+            if display_df:
+                st.dataframe(filtered_df)
 
-            if categorize_by == "Denylist Status":
-                color_key = "rx_on_denylist"
-            else:
-                color_key = "name_maker"
+            if display_plots:
+                if categorize_by == "Denylist Status":
+                    color_key = "rx_on_denylist"
+                else:
+                    color_key = "name_maker"
 
-            st.subheader("Denylist Breakdown")
-            st.plotly_chart(plot_denylist_breakdown(filtered_df, baseline_df))
+                st.subheader("Denylist Breakdown")
+                st.plotly_chart(plot_denylist_breakdown(filtered_df, baseline_df))
 
-            st.subheader("Hotspot Locations")
-            st.plotly_chart(plot_hotspot_locations(filtered_df, color_key))
+                st.subheader("Hotspot Locations")
+                st.plotly_chart(plot_hotspot_locations(filtered_df, color_key))
 
-            st.subheader("Ownership Patterns")
-            st.plotly_chart(plot_ownership_breakdown(filtered_df, hotspots_per_account))
+                st.subheader("Ownership Patterns")
+                st.plotly_chart(plot_ownership_breakdown(filtered_df, hotspots_per_account))
 
-            st.subheader("Witness Counts")
-            st.plotly_chart(plot_histogram(plot_df, "n_witnessed"))
+                st.subheader("Witness Counts")
+                st.plotly_chart(plot_histogram(plot_df, "n_witnessed"))
 
-            st.subheader("Witness Distances")
-            st.plotly_chart(plot_histogram(plot_df, "med_distance"))
+                st.subheader("Witness Distances")
+                st.plotly_chart(plot_histogram(plot_df, "med_distance"))
 
-            st.subheader("Data Transfer")
-            st.plotly_chart(plot_data_transfer(filtered_df, baseline_df))
+                st.subheader("Data Transfer")
+                st.plotly_chart(plot_data_transfer(filtered_df, baseline_df))
 
-            st.subheader("Reward Scales of Witnessed")
-            st.plotly_chart(plot_histogram(plot_df, "avg_tx_reward_scale"))
+                st.subheader("Reward Scales of Witnessed")
+                st.plotly_chart(plot_histogram(plot_df, "avg_tx_reward_scale"))
 
-            st.subheader("Same-Maker Witnessing")
-            st.plotly_chart(plot_histogram(plot_df, "same_maker_ratio"))
+                st.subheader("Same-Maker Witnessing")
+                st.plotly_chart(plot_histogram(plot_df, "same_maker_ratio"))
 
-            st.subheader("Age of Witnessed Hotspots")
-            st.plotly_chart(plot_histogram(plot_df, "avg_tx_age_blocks"))
+                st.subheader("Age of Witnessed Hotspots")
+                st.plotly_chart(plot_histogram(plot_df, "avg_tx_age_blocks"))
 
-            st.subheader("Variability in Age of Witnessed Hotspots")
-            st.plotly_chart(plot_histogram(plot_df, "std_tx_first_block"))
+                st.subheader("Variability in Age of Witnessed Hotspots")
+                st.plotly_chart(plot_histogram(plot_df, "std_tx_first_block"))
 
 
