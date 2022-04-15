@@ -132,6 +132,13 @@ if submit:
         else:
             if display_df:
                 st.dataframe(filtered_df)
+                st.download_button(
+                    "Export CSV",
+                    filtered_df.to_csv().encode("utf-8"),
+                    "results.csv",
+                    "text/csv",
+                    key='download-csv'
+                )
 
             if display_plots:
                 if categorize_by == "Denylist Status":
