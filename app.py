@@ -176,4 +176,10 @@ if submit:
                 st.subheader("Variability in Age of Witnessed Hotspots")
                 st.plotly_chart(plot_histogram(plot_df, "std_tx_first_block"))
 
+                st.subheader("RSSI vs Distance R2")
+                st.plotly_chart(plot_histogram(plot_df, "r2_rssi_distance"))
+
+                st.subheader("RSSI vs Distance Slope")
+                st.plotly_chart(plot_histogram(plot_df, "slope_rssi_distance"))
+
 
