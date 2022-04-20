@@ -136,14 +136,14 @@ if st.button("Submit"):
 
     st.subheader("Same-Maker Witness Ratios")
     cols2 = st.columns(3)
-    cols2[0].metric("1 Degree", same_maker_first_hop)
-    cols2[1].metric("2 Degrees", same_maker_overall)
-    cols2[2].metric("In Largest Clique", same_maker_clique)
+    cols2[0].metric("1 Degree", np.round(same_maker_first_hop, 2))
+    cols2[1].metric("2 Degrees", np.round(same_maker_overall, 2))
+    cols2[2].metric("In Largest Clique", np.round(same_maker_clique, 2))
 
     st.subheader("Same-Owner Witness Ratios")
     cols3 = st.columns(3)
-    cols3[0].metric("1 Degree", same_owner_first_hop)
-    cols3[1].metric("2 Degrees", same_owner_overall)
-    cols3[2].metric("In Largest Clique", same_owner_clique)
+    cols3[0].metric("1 Degree", np.round(same_owner_first_hop, 2))
+    cols3[1].metric("2 Degrees", np.round(same_owner_overall, 2))
+    cols3[2].metric("In Largest Clique", np.round(same_owner_clique, 2))
 
     st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id"], axis=1))
