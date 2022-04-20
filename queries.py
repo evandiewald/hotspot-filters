@@ -55,3 +55,10 @@ sum(num_packets) as packets_transferred
 from data_credits
 group by client;
 """
+
+
+n_blocks_sql = """
+select (select value from follower_info where name = 'sync_height') - (select value from follower_info where name = 'first_block');
+"""
+
+

@@ -18,9 +18,11 @@ baseline_df = dataset.sample(10000) # cache a baseline for comparison
 hotspots_per_account = pd.DataFrame(dataset.groupby("owner").size())
 options = get_form_config(dataset)
 
+n_blocks_in_dataset = engine.execute(n_blocks_sql).one()[0]
+
 st.title("Hotspot POC Filtering")
-st.markdown("""This tool is useful for combing through the entire hotspot population based on common metrics related to POC.
-Results, which are refreshed daily, are based on challenge receipts and data transfer metrics for the last `15,000` blocks.
+st.markdown(f"""This tool is useful for combing through the entire hotspot population based on common metrics related to POC.
+Results, which are refreshed daily, are based on challenge receipts and data transfer metrics for the last `{n_blocks_in_dataset}` blocks.
 See [`helium-transaction-etl`](https://github.com/evandiewald/helium-transaction-etl).""")
 
 with st.form("filters_form") as form:
