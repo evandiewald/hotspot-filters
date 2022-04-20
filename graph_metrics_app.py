@@ -96,54 +96,57 @@ def delta_relative_to_pop(graph_metrics, key, value):
 
 
 if st.button("Submit"):
-    G, clique, clustering_coeff, in_degree = calculate_graph_metrics(address, engine)
+    try:
+        G, clique, clustering_coeff, in_degree = calculate_graph_metrics(address, engine)
 
-    nodes = pd.DataFrame({"address": n, "order": nx.dijkstra_path_length(G, address, n), "in_clique": True if n in clique else False} for n in G.nodes())
-    nodes = nodes.merge(gateway_inventory, left_on="address", right_on=gateway_inventory.index)
-    nodes = nodes.merge(makers, left_on="payer", right_on=makers.index, suffixes=("_gateway", "_maker"))
-    nodes = nodes.set_index("address")
-    nodes["marker_size"] = 100
-    print(nodes.head(10))
+        nodes = pd.DataFrame({"address": n, "order": nx.dijkstra_path_length(G, address, n), "in_clique": True if n in clique else False} for n in G.nodes())
+        nodes = nodes.merge(gateway_inventory, left_on="address", right_on=gateway_inventory.index)
+        nodes = nodes.merge(makers, left_on="payer", right_on=makers.index, suffixes=("_gateway", "_maker"))
+        nodes = nodes.set_index("address")
+        nodes["marker_size"] = 100
 
-    same_maker_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["payer"] == nodes["payer"][address])]) / len(nodes[nodes["order"] == 1])
-    same_maker_overall = (len(nodes[nodes["payer"] == nodes["payer"][address]]) - 1) / (len(nodes) - 1)
-    same_maker_clique = (len(nodes[(nodes["in_clique"] > 0) & (nodes["payer"] == nodes["payer"][address])]) - 1) / (len(nodes[nodes["in_clique"] > 0]) - 1)
+        same_maker_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["payer"] == nodes["payer"][address])]) / len(nodes[nodes["order"] == 1])
+        same_maker_overall = (len(nodes[nodes["payer"] == nodes["payer"][address]]) - 1) / (len(nodes) - 1)
+        same_maker_clique = (len(nodes[(nodes["in_clique"] > 0) & (nodes["payer"] == nodes["payer"][address])]) - 1) / (len(nodes[nodes["in_clique"] > 0]) - 1)
 
-    same_owner_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["owner"] == nodes["owner"][address])]) / len(nodes[nodes["order"] == 1])
-    same_owner_overall = (len(nodes[nodes["owner"] == nodes["owner"][address]]) - 1) / (len(nodes) - 1)
-    same_owner_clique = (len(nodes[(nodes["in_clique"] > 0) & (nodes["owner"] == nodes["owner"][address])]) - 1) / (len(nodes[nodes["in_clique"] > 0]) - 1)
+        same_owner_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["owner"] == nodes["owner"][address])]) / len(nodes[nodes["order"] == 1])
+        same_owner_overall = (len(nodes[nodes["owner"] == nodes["owner"][address]]) - 1) / (len(nodes) - 1)
+        same_owner_clique = (len(nodes[(nodes["in_clique"] > 0) & (nodes["owner"] == nodes["owner"][address])]) - 1) / (len(nodes[nodes["in_clique"] > 0]) - 1)
 
-    st.subheader("Hotspot Locations")
-    st.markdown("The *order* of a node refers to its shortest-path distance from the root node. The root node itself will have an order of 0, "
-                "its immediate witnesses are 1st order, and *their* witnesses are 2nd order.")
-    st.plotly_chart(px.scatter_mapbox(nodes, lat="lat", lon="lon", color="order", size="marker_size", hover_data=["name_gateway", "name_maker", "reward_scale", "owner", "in_clique"], hover_name=nodes.index).update_layout(mapbox_style="dark",
-                      # mapbox_accesstoken=os.getenv("MAPBOX_API_KEY"),
-                      showlegend=False,
-                      mapbox_zoom=10,
-                      margin={'l':0, 'r':0, 'b':0, 't':0}))
+        st.subheader("Hotspot Locations")
+        st.markdown("The *order* of a node refers to its shortest-path distance from the root node. The root node itself will have an order of 0, "
+                    "its immediate witnesses are 1st order, and *their* witnesses are 2nd order.")
+        st.plotly_chart(px.scatter_mapbox(nodes, lat="lat", lon="lon", color="order", size="marker_size", hover_data=["name_gateway", "name_maker", "reward_scale", "owner", "in_clique"], hover_name=nodes.index).update_layout(mapbox_style="dark",
+                          # mapbox_accesstoken=os.getenv("MAPBOX_API_KEY"),
+                          showlegend=False,
+                          mapbox_zoom=10,
+                          margin={'l':0, 'r':0, 'b':0, 't':0}))
 
-    st.subheader("Graph Metrics")
-    cols1 = st.columns(3)
-    cols1[0].metric("In Degree", in_degree)
-    cols1[1].metric("Largest Clique Size", len(clique), delta=delta_relative_to_pop(graph_metrics, "largest_clique", len(clique)))
-    cols1[2].metric("Clustering Coefficient", np.round(clustering_coeff, 2), delta=delta_relative_to_pop(graph_metrics, "clustering_coefficient", clustering_coeff))
+        st.subheader("Graph Metrics")
+        cols1 = st.columns(3)
+        cols1[0].metric("In Degree", in_degree)
+        cols1[1].metric("Largest Clique Size", len(clique), delta=delta_relative_to_pop(graph_metrics, "largest_clique", len(clique)))
+        cols1[2].metric("Clustering Coefficient", np.round(clustering_coeff, 2), delta=delta_relative_to_pop(graph_metrics, "clustering_coefficient", clustering_coeff))
 
-    pos = {p: (nodes["lon"][p], nodes["lat"][p]) for p in nodes.index}
-    fig, ax = plt.subplots()
-    ax.set_title("Witness Graph with Largest Clique (Yellow Nodes)")
-    nx.draw(G, pos, node_color=nodes["in_clique"], ax=ax)
-    st.pyplot(fig)
+        pos = {p: (nodes["lon"][p], nodes["lat"][p]) for p in nodes.index}
+        fig, ax = plt.subplots()
+        ax.set_title("Witness Graph with Largest Clique (Yellow Nodes)")
+        nx.draw(G, pos, node_color=nodes["in_clique"], ax=ax)
+        st.pyplot(fig)
 
-    st.subheader("Same-Maker Witness Ratios")
-    cols2 = st.columns(3)
-    cols2[0].metric("1 Degree", np.round(same_maker_first_hop, 2))
-    cols2[1].metric("2 Degrees", np.round(same_maker_overall, 2))
-    cols2[2].metric("In Largest Clique", np.round(same_maker_clique, 2))
+        st.subheader("Same-Maker Witness Ratios")
+        cols2 = st.columns(3)
+        cols2[0].metric("1 Degree", np.round(same_maker_first_hop, 2))
+        cols2[1].metric("2 Degrees", np.round(same_maker_overall, 2))
+        cols2[2].metric("In Largest Clique", np.round(same_maker_clique, 2))
 
-    st.subheader("Same-Owner Witness Ratios")
-    cols3 = st.columns(3)
-    cols3[0].metric("1 Degree", np.round(same_owner_first_hop, 2))
-    cols3[1].metric("2 Degrees", np.round(same_owner_overall, 2))
-    cols3[2].metric("In Largest Clique", np.round(same_owner_clique, 2))
+        st.subheader("Same-Owner Witness Ratios")
+        cols3 = st.columns(3)
+        cols3[0].metric("1 Degree", np.round(same_owner_first_hop, 2))
+        cols3[1].metric("2 Degrees", np.round(same_owner_overall, 2))
+        cols3[2].metric("In Largest Clique", np.round(same_owner_clique, 2))
 
-    st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id"], axis=1))
+        st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id"], axis=1))
+
+    except IndexError:
+        st.error("No results found - we likely don't have data for this hotspot yet.")
