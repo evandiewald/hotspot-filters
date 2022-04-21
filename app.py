@@ -144,7 +144,7 @@ if submit:
 
             if display_plots:
                 if categorize_by == "Denylist Status":
-                    color_key = "rx_on_denylist"
+                    color_key = "denied_at_some_point"
                 else:
                     color_key = "name_maker"
 
@@ -183,5 +183,11 @@ if submit:
 
                 st.subheader("RSSI vs Distance Slope")
                 st.plotly_chart(plot_histogram(plot_df, "slope_rssi_distance"))
+
+                st.subheader("RSSI vs SNR R2")
+                st.plotly_chart(plot_histogram(plot_df, "r2_rssi_snr"))
+
+                st.subheader("RSSI vs Distance Slope")
+                st.plotly_chart(plot_histogram(plot_df, "slope_rssi_snr"))
 
 

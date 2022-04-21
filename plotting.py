@@ -247,7 +247,7 @@ def plot_ownership_breakdown(filtered_df: pd.DataFrame, baseline_df: pd.DataFram
     return fig
 
 
-def plot_hotspot_locations(filtered_df: pd.DataFrame, color_key: str = "rx_on_denylist"):
+def plot_hotspot_locations(filtered_df: pd.DataFrame, color_key: str = "denied_at_some_point"):
     # not sure why result_type = "expand" isn't doing this in one step
 
     filtered_df["coords"] = filtered_df["location"].apply(h3.h3_to_geo)

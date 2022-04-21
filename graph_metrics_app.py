@@ -94,6 +94,9 @@ def calculate_graph_metrics(address: str, engine: Engine):
 def delta_relative_to_pop(graph_metrics, key, value):
     return f"{np.round(len(graph_metrics[graph_metrics[key] <= value]) / len(graph_metrics) * 100, 0)}th Percentile"
 
+def blocks_to_est_days(blocks: int):
+    return f"Approx. {np.round(blocks / 1440, 1)} day(s)"
+
 
 if st.button("Submit"):
     try:
@@ -112,6 +115,10 @@ if st.button("Submit"):
         same_owner_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["owner"] == nodes["owner"][address])]) / len(nodes[nodes["order"] == 1])
         same_owner_overall = (len(nodes[nodes["owner"] == nodes["owner"][address]]) - 1) / (len(nodes) - 1)
         same_owner_clique = (len(nodes[(nodes["in_clique"] > 0) & (nodes["owner"] == nodes["owner"][address])]) - 1) / (len(nodes[nodes["in_clique"] > 0]) - 1)
+
+        range_first_blocks_first_hop = int(np.std(nodes[nodes["order"] == 1]["first_block"]))#max(nodes[nodes["order"] == 1]["first_block"]) - min(nodes[nodes["order"] == 1]["first_block"])
+        range_first_blocks_overall = int(np.std(nodes[nodes["order"] > 0]["first_block"]))#max(nodes[nodes["order"] > 0]["first_block"]) - min(nodes[nodes["order"] > 0]["first_block"])
+        range_first_blocks_clique = int(np.std(nodes[nodes["in_clique"] > 0]["first_block"]))#max(nodes[nodes["in_clique"] > 0]["first_block"]) - min(nodes[nodes["in_clique"] > 0]["first_block"])
 
         st.subheader("Hotspot Locations")
         st.markdown("The *order* of a node refers to its shortest-path distance from the root node. The root node itself will have an order of 0, "
@@ -145,6 +152,13 @@ if st.button("Submit"):
         cols3[0].metric("1 Degree", np.round(same_owner_first_hop, 2))
         cols3[1].metric("2 Degrees", np.round(same_owner_overall, 2))
         cols3[2].metric("In Largest Clique", np.round(same_owner_clique, 2))
+
+        st.subheader("Standard Deviation in Assertion Time (blocks)")
+        st.caption("This is an indication of how quickly a cluster was deployed. On a network this large, it is anomalous if all a hotspot's witnesses were asserted within a couple days.")
+        cols4 = st.columns(3)
+        cols4[0].metric("1 Degree", range_first_blocks_first_hop, delta=blocks_to_est_days(range_first_blocks_first_hop))
+        cols4[1].metric("2 Degrees", range_first_blocks_overall, delta=blocks_to_est_days(range_first_blocks_overall))
+        cols4[2].metric("In Largest Clique", range_first_blocks_clique, delta=blocks_to_est_days(range_first_blocks_clique))
 
         st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id"], axis=1))
 
