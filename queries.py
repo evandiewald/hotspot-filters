@@ -2,7 +2,8 @@
 
 
 detailed_receipt_sql = """
-select
+with a as
+(select
 
 rx_address as address,
 count(distinct tx_address) 		as n_witnessed,
@@ -42,7 +43,9 @@ stddev(tx_first_block) as std_tx_first_block,
 max(rx_on_denylist)             as rx_on_denylist
 
 from detailed_receipts
-group by rx_address;
+group by rx_address)
+
+select a.*, b.long_country from a join gateway_inventory g on a.address = g.address join locations b on g.location = b.location;
 
 """
 

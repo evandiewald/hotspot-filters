@@ -6,6 +6,7 @@ import numpy as np
 
 class Filters(BaseModel):
     makers: Optional[List[str]]
+    countries: Optional[List[str]]
 
     data_transfer_opts: str
     data_transfer_range: Tuple[float, float]
@@ -40,7 +41,8 @@ class Filters(BaseModel):
 
 def filter_dataset(dataset: pd.DataFrame, filters: Filters) -> pd.DataFrame:
     filtered = dataset[
-        (dataset["name_maker"].isin(filters.makers)) &
+        (dataset["name_maker"].isin(filters.makers) if "All" not in filters.makers else True) &
+        (dataset["long_country"].isin(filters.countries) if "All" not in filters.countries else True) &
         (dataset["packets_transferred"] > 0 if filters.data_transfer_opts == "Data Transferring Hotspots ONLY" else True) &
         (dataset["packets_transferred"] == 0 if filters.data_transfer_opts == "NO Data Transferring Hotspots ONLY" else True) &
         (dataset["packets_transferred"].between(np.percentile(dataset["packets_transferred"], filters.data_transfer_range[0]),

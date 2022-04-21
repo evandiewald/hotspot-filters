@@ -75,12 +75,14 @@ def load_dataset(_engine: Engine) -> pd.DataFrame:
 
 class FormConfig(BaseModel):
     makers: List[str]
+    countries: List[str]
 
 
 @st.experimental_memo
 def get_form_config(dataset: pd.DataFrame) -> FormConfig:
 
     config = FormConfig(
-        makers=list(set(dataset["name_maker"]))
+        makers=list(set(dataset["name_maker"])),
+        countries=list(set(dataset["long_country"]))
     )
     return config

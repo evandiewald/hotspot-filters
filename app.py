@@ -17,6 +17,8 @@ dataset = load_dataset(engine)
 baseline_df = dataset.sample(10000) # cache a baseline for comparison
 hotspots_per_account = pd.DataFrame(dataset.groupby("owner").size())
 options = get_form_config(dataset)
+options.countries.insert(0,"All")
+options.makers.insert(0,"All")
 
 n_blocks_in_dataset = engine.execute(n_blocks_sql).one()[0]
 
@@ -28,9 +30,13 @@ See [`helium-transaction-etl`](https://github.com/evandiewald/helium-transaction
 with st.form("filters_form") as form:
     # makers
     with st.expander("Makers"):
-        makers = st.multiselect("Manufacturer(s)", options=options.makers, default=options.makers)
+        makers = st.multiselect("Manufacturer(s)", options=options.makers, default="All")
         # only witnesses same maker
         same_maker_only = st.checkbox("Only include hotspots that exclusively witness others of the same manufacturer.")
+
+    # countries
+    with st.expander("Countries"):
+        countries = st.multiselect("Countries", options=options.countries, default="All")
 
     # data transfer
     with st.expander("Data Transfer"):
@@ -98,6 +104,7 @@ with st.form("filters_form") as form:
 if submit:
     filters = Filters(
         makers=makers,
+        countries=countries,
         data_transfer_opts=data_transfer_opts,
         data_transfer_range=data_transfer_range,
         n_witnessed_range=n_witnessed_range,
