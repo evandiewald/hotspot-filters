@@ -106,6 +106,7 @@ if st.button("Submit"):
         nodes = nodes.merge(gateway_inventory, left_on="address", right_on=gateway_inventory.index)
         nodes = nodes.merge(makers, left_on="payer", right_on=makers.index, suffixes=("_gateway", "_maker"))
         nodes = nodes.set_index("address")
+        nodes["address"] = nodes.index # this allows you to copy / paste the dataframe
         nodes["marker_size"] = 100
 
         same_maker_first_hop = len(nodes[(nodes["order"] == 1) & (nodes["payer"] == nodes["payer"][address])]) / len(nodes[nodes["order"] == 1])
@@ -160,7 +161,7 @@ if st.button("Submit"):
         cols4[1].metric("2 Degrees", range_first_blocks_overall, delta=blocks_to_est_days(range_first_blocks_overall))
         cols4[2].metric("In Largest Clique", range_first_blocks_clique, delta=blocks_to_est_days(range_first_blocks_clique))
 
-        st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id"], axis=1))
+        st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id", "marker_size"], axis=1).style.hide_index().background_gradient(cmap="Blues"))
 
     except IndexError:
         st.error("No results found - we likely don't have data for this hotspot yet.")

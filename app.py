@@ -47,18 +47,23 @@ with st.form("filters_form") as form:
                                         min_value=0, max_value=100, value=(0, 100), step=1, disabled=data_transfer_slider_disabled)
 
     # witnessing numbers
-    with st.expander("Witness Counts"):
-        n_witnessed_range = st.slider("Select percentile range of number of unique witnesses.",
-                                      min_value=0, max_value=100, value=(0, 100), step=1)
-        total_witnessed_range = st.slider("Select percentile range for total number of witness events.",
-                                      min_value=0, max_value=100, value=(0, 100), step=1)
+    # with st.expander("Witness Counts"):
+    #     n_witnessed_range = st.slider("Select percentile range of number of unique witnesses.",
+    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
+    #     total_witnessed_range = st.slider("Select percentile range for total number of witness events.",
+    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
 
     # distances
-    with st.expander("Witness Distances"):
-        med_distance_range = st.slider("Select percentile range of median witness distances.",
-                                      min_value=0, max_value=100, value=(0, 100), step=1)
-        max_distance_range = st.slider("Select percentile range of max witness distances.",
-                                      min_value=0, max_value=100, value=(0, 100), step=1)
+    # with st.expander("Witness Distances"):
+    #     med_distance_range = st.slider("Select percentile range of median witness distances.",
+    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
+    #     max_distance_range = st.slider("Select percentile range of max witness distances.",
+    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
+
+    # first_block
+    with st.expander("Assertion Times"):
+        first_block_max = st.number_input("Only include hotspots asserted BEFORE block", value=9999999, min_value=0)
+        first_block_min = st.number_input("Only include hotspots asserted AFTER block", value=0, min_value=0)
 
     # transmit scale
     with st.expander("Reward Scales"):
@@ -69,18 +74,18 @@ with st.form("filters_form") as form:
                                       min_value=0.0, max_value=1.0, value=(0., 1.), step=0.05, disabled=perfect_reward_scale_only)
 
     # antenna gain / elevation
-    with st.expander("Antenna Gain / Elevation"):
-        gain_range = st.slider("Select range of antenna gains (dB).",
-                               min_value=10, max_value=150, value=(10, 150), step=10)
-        elevation_range = st.slider("Select percentile range of elevations.",
-                               min_value=0, max_value=100, value=(0, 100), step=1)
+    # with st.expander("Antenna Gain / Elevation"):
+    #     gain_range = st.slider("Select range of antenna gains (dB).",
+    #                            min_value=10, max_value=150, value=(10, 150), step=10)
+    #     elevation_range = st.slider("Select percentile range of elevations.",
+    #                            min_value=0, max_value=100, value=(0, 100), step=1)
 
     # average / std age of transmitters
-    with st.expander("Age and Variability of Witnessed Hotspots"):
-        avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
-                                      min_value=0, max_value=int(5e5), value=(0, int(5e5)), step=1000)
-        std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
-                                      min_value=0, max_value=int(5e5), value=(0, int(1e5)), step=1000)
+    # with st.expander("Age and Variability of Witnessed Hotspots"):
+    #     avg_tx_age_blocks_range = st.slider("Select range of average beaconer age (blocks).",
+    #                                   min_value=0, max_value=int(5e5), value=(0, int(5e5)), step=1000)
+    #     std_tx_age_blocks_range = st.slider("Select range of variability in beaconer age (blocks).",
+    #                                   min_value=0, max_value=int(5e5), value=(0, int(1e5)), step=1000)
 
     # hotspot has been moved
     with st.expander("Re-asserted Hotspots"):
@@ -107,20 +112,22 @@ if submit:
         countries=countries,
         data_transfer_opts=data_transfer_opts,
         data_transfer_range=data_transfer_range,
-        n_witnessed_range=n_witnessed_range,
-        total_witnessed_range=total_witnessed_range,
-        med_distance_range=med_distance_range,
-        max_distance_range=max_distance_range,
+        first_block_max=first_block_max,
+        first_block_min=first_block_min,
+        # n_witnessed_range=n_witnessed_range,
+        # total_witnessed_range=total_witnessed_range,
+        # med_distance_range=med_distance_range,
+        # max_distance_range=max_distance_range,
         perfect_reward_scale_only=perfect_reward_scale_only,
         avg_tx_reward_scale_range=avg_tx_reward_scale_range,
         std_tx_reward_scale_range=std_tx_reward_scale_range,
         witnesses_denylisted_tx=witnesses_denylisted_tx,
         same_maker_only=same_maker_only,
-        avg_tx_age_blocks_range=avg_tx_age_blocks_range,
-        std_tx_age_blocks_range=std_tx_age_blocks_range,
+        # avg_tx_age_blocks_range=avg_tx_age_blocks_range,
+        # std_tx_age_blocks_range=std_tx_age_blocks_range,
         reasserted_hotspots_only=reasserted_hotspots_only,
-        gain_range=gain_range,
-        elevation_range=elevation_range,
+        # gain_range=gain_range,
+        # elevation_range=elevation_range,
         on_current_denylist=on_current_denylist,
         on_any_denylist=on_any_denylist,
         previously_denied=previously_denied,
