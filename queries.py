@@ -61,7 +61,7 @@ group by client;
 
 
 n_blocks_sql = """
-select (select value from follower_info where name = 'sync_height') - (select value from follower_info where name = 'first_block');
+select max(block) - min(block) from challenge_receipts_parsed;
 """
 
 

@@ -161,7 +161,7 @@ if st.button("Submit"):
         cols4[1].metric("2 Degrees", range_first_blocks_overall, delta=blocks_to_est_days(range_first_blocks_overall))
         cols4[2].metric("In Largest Clique", range_first_blocks_clique, delta=blocks_to_est_days(range_first_blocks_clique))
 
-        st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id", "marker_size"], axis=1).style.hide_index().background_gradient(cmap="Blues"))
+        st.dataframe(nodes.drop(["coordinates", "location", "lat", "lon", "payer", "id", "marker_size"], axis=1).style.hide(axis="index").background_gradient(cmap="Blues"))
         st.download_button(
             "Export CSV",
             nodes.to_csv().encode("utf-8"),

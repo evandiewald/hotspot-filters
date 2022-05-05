@@ -153,4 +153,5 @@ cython_debug/
 .idea/
 assets/
 static/
+!static/makers.csv
 .mapbox_token
