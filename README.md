@@ -7,5 +7,6 @@ Filtering tool to identify and analyze hotspots with common characteristics.
 - Make a copy of `.env.template` called `.env` and insert your postgres connection string.
 - `pip install -r requirements.txt`
   - `psycopg2` may need to be installed separately. Use `psycopg2[binary]` on Ubuntu.
+- Generate a free [Mapbox API Token](https://www.mapbox.com/) and paste it in a new file called `.mapbox_token`.
 - `streamlit run app.py`
 The query is relatively time-consuming and will cache daily by default.
