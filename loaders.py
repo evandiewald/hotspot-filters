@@ -49,7 +49,7 @@ def load_dataset(_engine: Engine) -> pd.DataFrame:
 
         # inner join drops inactive gateways. drop extraneous columns
         dataset = result.merge(gateway_inventory, on="address").merge(makers, left_on="payer", right_on="address", suffixes=("_gateway", "_maker")). \
-            drop(["id", "last_poc_onion_key_hash", "last_poc_challenge", "mode", "payer", "first_timestamp"], axis=1)
+            drop(["Unnamed: 0", "last_poc_onion_key_hash", "last_poc_challenge", "mode", "payer", "first_timestamp"], axis=1)
 
         print(dataset.columns)
 
