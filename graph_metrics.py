@@ -40,19 +40,20 @@ for i, address in enumerate(addresses):
     cliques = nx.cliques_containing_node(G, nodes=[address])[address]
     clique_sizes = [len(c) for c in cliques]
     # largest_cliques = [c for c in cliques if len(c) == max(clique_sizes)]
-    largest_clique_size = max(clique_sizes)
+    if clique_sizes:
+        largest_clique_size = max(clique_sizes)
 
-    # clustering coefficient
-    clustering_coeff = nx.clustering(G, nodes=[address])[address]
+        # clustering coefficient
+        clustering_coeff = nx.clustering(G, nodes=[address])[address]
 
-    # degree
-    in_degree = G.degree[address]
+        # degree
+        in_degree = G.degree[address]
 
-    # link prediction
-    # non_edges = [(ROOT_NODE_ADDRESS, n) for n in nx.non_neighbors(G, ROOT_NODE_ADDRESS)]
-    # jc = [j for j in nx.jaccard_coefficient(G, non_edges)]
+        # link prediction
+        # non_edges = [(ROOT_NODE_ADDRESS, n) for n in nx.non_neighbors(G, ROOT_NODE_ADDRESS)]
+        # jc = [j for j in nx.jaccard_coefficient(G, non_edges)]
 
-    results.append({"address": address, "largest_clique": largest_clique_size, "clustering_coefficient": clustering_coeff, "in_degree": in_degree})
+        results.append({"address": address, "largest_clique": largest_clique_size, "clustering_coefficient": clustering_coeff, "in_degree": in_degree})
 
     if i % 10 == 0:
         print(f"{i} / {len(addresses)} graphs complete.")
