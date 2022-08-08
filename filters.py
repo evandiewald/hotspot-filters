@@ -14,8 +14,11 @@ class Filters(BaseModel):
     n_witnessed_range: Optional[Tuple[float, float]]
     total_witnessed_range: Optional[Tuple[float, float]]
 
-    med_distance_range: Optional[Tuple[float, float]]
-    max_distance_range: Optional[Tuple[float, float]]
+    min_distance_min: Union[int, float]
+    min_distance_max: Union[int, float]
+
+    max_distance_min: Union[int, float]
+    max_distance_max: Union[int, float]
 
     first_block_max: Optional[int]
     first_block_min: Optional[int]
@@ -55,10 +58,8 @@ def filter_dataset(dataset: pd.DataFrame, filters: Filters) -> pd.DataFrame:
                                         np.percentile(dataset["n_witnessed"], filters.n_witnessed_range[1])) if filters.n_witnessed_range else True) &
         (dataset["total_witnessed"].between(np.percentile(dataset["total_witnessed"], filters.total_witnessed_range[0]),
                                             np.percentile(dataset["total_witnessed"], filters.total_witnessed_range[1])) if filters.total_witnessed_range else True) &
-        (dataset["med_distance"].between(np.percentile(dataset["med_distance"], filters.med_distance_range[0]),
-                                         np.percentile(dataset["med_distance"], filters.med_distance_range[1])) if filters.med_distance_range else True) &
-        (dataset["max_distance"].between(np.percentile(dataset["max_distance"], filters.max_distance_range[0]),
-                                         np.percentile(dataset["max_distance"], filters.max_distance_range[1])) if filters.max_distance_range else True) &
+        (dataset["min_distance"].between(filters.min_distance_min, filters.min_distance_max)) &
+        (dataset["max_distance"].between(filters.max_distance_min, filters.max_distance_max)) &
         (dataset["avg_tx_reward_scale"] > 0.999 if filters.perfect_reward_scale_only is True else True) &
         (dataset["avg_tx_reward_scale"].between(filters.avg_tx_reward_scale_range[0], filters.avg_tx_reward_scale_range[1])
          if filters.perfect_reward_scale_only is False else True) &

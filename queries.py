@@ -8,7 +8,7 @@ with a as
 rx_address as address,
 count(distinct tx_address) 		as n_witnessed,
 count(tx_address) 		        as total_witnessed,
-percentile_cont(0.5) WITHIN GROUP (ORDER BY distance_km)				as med_distance,
+min(distance_km)                as min_distance,
 max(distance_km)				as max_distance,
 avg(tx_reward_scale) 			as avg_tx_reward_scale,
 stddev(tx_reward_scale) 		as std_tx_reward_scale,

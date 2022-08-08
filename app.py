@@ -54,11 +54,13 @@ with st.form("filters_form") as form:
     #                                   min_value=0, max_value=100, value=(0, 100), step=1)
 
     # distances
-    # with st.expander("Witness Distances"):
-    #     med_distance_range = st.slider("Select percentile range of median witness distances.",
-    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
-    #     max_distance_range = st.slider("Select percentile range of max witness distances.",
-    #                                   min_value=0, max_value=100, value=(0, 100), step=1)
+    with st.expander("Witness Distances"):
+        st.markdown("**Minimum** Witness Distance (the distance between this hotspot and its *nearest* witness)")
+        min_distance_min = st.number_input("MINIMUM Witness Distance must be GREATER THAN (km):", value=0)
+        min_distance_max = st.number_input("MINIMUM Witness Distance must be LESS THAN (km):", value=100000)
+        st.markdown("**Maximum** Witness Distance (the distance between this hotspot and its *furthest* witness)")
+        max_distance_min = st.number_input("MAXIMUM Witness Distance must be GREATER THAN (km):", value=0)
+        max_distance_max = st.number_input("MAXIMUM Witness Distance must be LESS THAN (km):", value=100000)
 
     # first_block
     with st.expander("Assertion Times"):
@@ -116,8 +118,10 @@ if submit:
         first_block_min=first_block_min,
         # n_witnessed_range=n_witnessed_range,
         # total_witnessed_range=total_witnessed_range,
-        # med_distance_range=med_distance_range,
-        # max_distance_range=max_distance_range,
+        min_distance_min=min_distance_min,
+        min_distance_max=min_distance_max,
+        max_distance_min=max_distance_min,
+        max_distance_max=max_distance_max,
         perfect_reward_scale_only=perfect_reward_scale_only,
         avg_tx_reward_scale_range=avg_tx_reward_scale_range,
         std_tx_reward_scale_range=std_tx_reward_scale_range,
