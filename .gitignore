@@ -152,6 +152,6 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 .idea/
 assets/
-static/
+static/cache_*
 !static/makers.csv
 .mapbox_token
