@@ -1,5 +1,3 @@
-import plistlib
-
 from sqlalchemy.engine import create_engine, Engine
 from dotenv import load_dotenv
 from loaders import *
@@ -9,18 +7,26 @@ import plotly.express as px
 
 
 load_dotenv()
-px.set_mapbox_access_token(open(".mapbox_token").read())
+token = open(".mapbox_token").read() if ".mapbox_token" in os.listdir() else os.getenv("MAPBOX_TOKEN")
+px.set_mapbox_access_token(token)
 
 engine = create_engine(os.getenv("POSTGRES_CONNECTION_STRING"))
 
-dataset = load_dataset(engine)
-baseline_df = dataset.sample(10000) # cache a baseline for comparison
-hotspots_per_account = pd.DataFrame(dataset.groupby("owner").size())
-options = get_form_config(dataset)
-options.countries.insert(0,"All")
-options.makers.insert(0,"All")
 
-n_blocks_in_dataset = engine.execute(n_blocks_sql).one()[0]
+@st.experimental_memo(ttl=86400)
+def load_data(_engine):
+    dataset = load_dataset(_engine)
+    baseline_df = dataset.sample(10000) # cache a baseline for comparison
+    hotspots_per_account = pd.DataFrame(dataset.groupby("owner").size())
+    options = get_form_config(dataset)
+    options.countries.insert(0,"All")
+    options.makers.insert(0,"All")
+
+    n_blocks_in_dataset = _engine.execute(n_blocks_sql).one()[0]
+    return dataset, baseline_df, hotspots_per_account, options, n_blocks_in_dataset
+
+
+dataset, baseline_df, hotspots_per_account, options, n_blocks_in_dataset = load_data(engine)
 
 st.title("Hotspot POC Filtering")
 st.markdown(f"""This tool is useful for combing through the entire hotspot population based on common metrics related to POC.

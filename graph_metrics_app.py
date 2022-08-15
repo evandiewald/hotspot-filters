@@ -13,7 +13,8 @@ import numpy as np
 GRAPH_METRICS_PATH = "static/graph_metrics_sample.csv"
 
 load_dotenv()
-px.set_mapbox_access_token(open(".mapbox_token").read())
+token = open(".mapbox_token").read() if ".mapbox_token" in os.listdir() else os.getenv("MAPBOX_TOKEN")
+px.set_mapbox_access_token(token)
 
 
 @st.experimental_memo
@@ -125,7 +126,6 @@ if st.button("Submit"):
         st.markdown("The *order* of a node refers to its shortest-path distance from the root node. The root node itself will have an order of 0, "
                     "its immediate witnesses are 1st order, and *their* witnesses are 2nd order.")
         st.plotly_chart(px.scatter_mapbox(nodes, lat="lat", lon="lon", color="order", size="marker_size", hover_data=["name_gateway", "name_maker", "reward_scale", "owner", "in_clique"], hover_name=nodes.index).update_layout(mapbox_style="dark",
-                          # mapbox_accesstoken=os.getenv("MAPBOX_API_KEY"),
                           showlegend=False,
                           mapbox_zoom=10,
                           margin={'l':0, 'r':0, 'b':0, 't':0}))
